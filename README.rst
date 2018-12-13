@@ -176,30 +176,32 @@ Faust is...
     the rest is just Python, so If you know Python you can already use Faust to do
     stream processing, and it can integrate with just about anything.
 
-    Here's one of the easier applications you can make::
+    Here's one of the easier applications you can make:
 
-        import faust
+.. sourcecode:: python
 
-        class Greeting(faust.Record):
-            from_name: str
-            to_name: str
+    import faust
 
-        app = faust.App('hello-app', broker='kafka://localhost')
-        topic = app.topic('hello-topic', value_type=Greeting)
+    class Greeting(faust.Record):
+        from_name: str
+        to_name: str
 
-        @app.agent(topic)
-        async def hello(greetings):
-            async for greeting in greetings:
-                print(f'Hello from {greeting.from_name} to {greeting.to_name}')
+    app = faust.App('hello-app', broker='kafka://localhost')
+    topic = app.topic('hello-topic', value_type=Greeting)
 
-        @app.timer(interval=1.0)
-        async def example_sender(app):
-            await hello.send(
-                value=Greeting(from_name='Faust', to_name='you'),
-            )
+    @app.agent(topic)
+    async def hello(greetings):
+        async for greeting in greetings:
+            print(f'Hello from {greeting.from_name} to {greeting.to_name}')
 
-        if __name__ == '__main__':
-            app.main()
+    @app.timer(interval=1.0)
+    async def example_sender(app):
+        await hello.send(
+            value=Greeting(from_name='Faust', to_name='you'),
+        )
+
+    if __name__ == '__main__':
+        app.main()
 
     You're probably a bit intimidated by the `async` and `await` keywords,
     but you don't have to know how ``asyncio`` works to use
